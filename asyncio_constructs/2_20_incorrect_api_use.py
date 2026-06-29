@@ -1,0 +1,19 @@
+import asyncio
+import requests
+from util import delay, async_timed
+
+@async_timed()
+async def get_example_status() -> int:
+    return requests.get('http://www.example.com').status_code # the problem: this is blocking, so it will block the single event-loop thread
+
+@async_timed()
+async def main():
+    task_1 = asyncio.create_task(get_example_status())
+    task_2 = asyncio.create_task(get_example_status())
+    task_3 = asyncio.create_task(get_example_status())
+
+    await task_1
+    await task_2
+    await task_3
+
+asyncio.run(main())
